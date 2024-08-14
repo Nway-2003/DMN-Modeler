@@ -24,7 +24,7 @@ test.describe('DMN Editor Tests', () => {
   test.beforeAll(async () => {
     console.log('Setting up before all tests');
     // Place setup code here if needed
-<<<<<<< HEAD
+
   });
 
   // Runs once after all tests
@@ -46,7 +46,7 @@ test.describe('DMN Editor Tests', () => {
   });
 
 
-=======
+
   });
 
   // Runs once after all tests
@@ -84,7 +84,7 @@ test.describe('DMN Editor Tests', () => {
     expect(xmlContent).toContain('<?xml version="1.0" encoding="UTF-8"?>');
   });
 
->>>>>>> b41ab7e109f49178a6417cac5869d9a42d88e60d
+
   test('should trigger file input and select a DMN file', async ({ page }) => {
     const dmnXML = `
     <?xml version="1.0" encoding="UTF-8"?>
@@ -161,7 +161,7 @@ test.describe('DMN Editor Tests', () => {
     // Verify that the file chooser dialog is opened
     expect(fileChooser).toBeDefined();
   });
-<<<<<<< HEAD
+
 
   test('should save DMN diagram as JSON', async ({ page }) => {
     // Create a temporary DMN file
@@ -219,7 +219,3 @@ test.describe('DMN Editor Tests', () => {
       deleteTempFile(tempFilePath);
     }
   });
-
-=======
->>>>>>> b41ab7e109f49178a6417cac5869d9a42d88e60d
-});
