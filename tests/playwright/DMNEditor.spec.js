@@ -20,11 +20,31 @@ const deleteTempFile = (filePath) => {
 };
 
 test.describe('DMN Editor Tests', () => {
+  // Runs once before all tests
+  test.beforeAll(async () => {
+    console.log('Setting up before all tests');
+    // Place setup code here if needed
+  });
 
-  test('should save diagram as JSON', async ({ page }) => {
+  // Runs once after all tests
+  test.afterAll(async () => {
+    console.log('Cleaning up after all tests');
+    // Place teardown code here if needed
+  });
+
+  // Runs before each test
+  test.beforeEach(async ({ page }) => {
     await page.goto('http://localhost:5173'); // Navigate to the DMN Editor page
     await page.waitForSelector('#dmn-container'); // Wait for the DMN editor to load
+  });
 
+  // Runs after each test
+  test.afterEach(async () => {
+    console.log('Cleaning up after each test');
+    // Place any per-test cleanup code here if needed
+  });
+
+  test('should save diagram as JSON', async ({ page }) => {
     const [download] = await Promise.all([
       page.waitForEvent('download', { timeout: 60000 }), // Wait for the download event
       page.click('#controls i.fas.fa-save'), // Trigger the download
@@ -42,9 +62,6 @@ test.describe('DMN Editor Tests', () => {
   });
 
   test('should trigger file input and select a DMN file', async ({ page }) => {
-    await page.goto('http://localhost:5173'); // Navigate to the DMN Editor page
-    await page.waitForSelector('#dmn-container'); // Wait for the DMN editor to load
-
     const dmnXML = `
     <?xml version="1.0" encoding="UTF-8"?>
     <definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd">
@@ -87,9 +104,6 @@ test.describe('DMN Editor Tests', () => {
   });
 
   test('should initialize DMN editor correctly', async ({ page }) => {
-    await page.goto('http://localhost:5173'); // Navigate to the DMN Editor page
-    await page.waitForSelector('#dmn-container'); // Wait for the DMN editor to load
-
     // Verify if the DMN container is visible
     const containerVisible = await page.isVisible('#dmn-container');
     expect(containerVisible).toBe(true);
@@ -103,9 +117,6 @@ test.describe('DMN Editor Tests', () => {
 
   // New test: Verify that the default diagram is displayed correctly
   test('should display a default diagram on initialization', async ({ page }) => {
-    await page.goto('http://localhost:5173'); // Navigate to the DMN Editor page
-    await page.waitForSelector('#dmn-container'); // Wait for the DMN editor to load
-
     // Check if the DMN container has some content that indicates a diagram is loaded
     const containerContent = await page.evaluate(() => {
       const container = document.querySelector('#dmn-container');
@@ -117,9 +128,6 @@ test.describe('DMN Editor Tests', () => {
   });
 
   test('should trigger file input dialog on "Retrieve DMN" button click', async ({ page }) => {
-    await page.goto('http://localhost:5173'); // Navigate to the DMN Editor page
-    await page.waitForSelector('#dmn-container'); // Wait for the DMN editor to load
-  
     // Click on the "Retrieve DMN" button to trigger file input
     const [fileChooser] = await Promise.all([
       page.waitForEvent('filechooser'), // Wait for the file chooser event
@@ -129,7 +137,4 @@ test.describe('DMN Editor Tests', () => {
     // Verify that the file chooser dialog is opened
     expect(fileChooser).toBeDefined();
   });
-
- 
-
 });
