@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:di="http://www.omg.org/spec/DMN/20180521/DI/" id="dishDecision" name="dishDecision" namespace="http://camunda.org/schema/1.0/dmn" exporter="dmn-js (https://demo.bpmn.io/dmn)" exporterVersion="16.4.0">
+  <decision id="decision_1nwzw38" name="Dish Decision">
+    <informationRequirement id="InformationRequirement_08jo4yt">
+      <requiredInput href="#InputData_17vs6e3" />
+    </informationRequirement>
+    <informationRequirement id="InformationRequirement_14j27jk">
+      <requiredDecision href="#Decision_0lzqqo5" />
+    </informationRequirement>
+    <decisionTable id="decisionTable_1m6a0i2">
+      <input id="input1" label="Weather">
+        <inputExpression id="inputExpression1" typeRef="string">
+          <text>weather</text>
+        </inputExpression>
+        <inputValues id="UnaryTests_1u49pat">
+          <text>"Summer","Winter","Other"</text>
+        </inputValues>
+      </input>
+      <output id="output1" label="Guests" name="guests" typeRef="number" />
+      <rule id="DecisionRule_16035jg">
+        <inputEntry id="UnaryTests_0fdmh90">
+          <text>"Summer"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1r0hrge">
+          <text>1</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_09ivd3c">
+        <inputEntry id="UnaryTests_0dq1z5l">
+          <text>"Winter"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_02ij024">
+          <text>2</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1r91a17">
+        <inputEntry id="UnaryTests_10pbpf7">
+          <text>"Other"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1tjg4sf">
+          <text>3</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <inputData id="InputData_17vs6e3" name="Weather" />
+  <inputData id="InputData_047drmz" name="day" />
+  <decision id="Decision_0lzqqo5" name="Number of Guests Decision">
+    <informationRequirement id="InformationRequirement_0h8a1yy">
+      <requiredInput href="#InputData_047drmz" />
+    </informationRequirement>
+    <decisionTable id="DecisionTable_1064o55">
+      <input id="InputClause_18v6a8x" label="Day">
+        <inputExpression id="LiteralExpression_1jldyjq" typeRef="string">
+          <text>day</text>
+        </inputExpression>
+        <inputValues id="UnaryTests_003c29z">
+          <text>"Monday","Tuesday","Other"</text>
+        </inputValues>
+      </input>
+      <output id="OutputClause_03cm9rs" label="Guests" name="guests" typeRef="number" />
+      <rule id="DecisionRule_18xbuy2">
+        <inputEntry id="UnaryTests_1wzr80m">
+          <text>"Monday"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0kcjfvw">
+          <text>1</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1tcdsqa">
+        <inputEntry id="UnaryTests_07w4tq6">
+          <text>"Tuesday"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_01ejvf0">
+          <text>2</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0j98f6y">
+        <inputEntry id="UnaryTests_1bxtxqu">
+          <text>"Other"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0gqrju1">
+          <text>3</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram id="DMNDiagram_04qbg9s">
+      <dmndi:DMNShape id="DMNShape_1vj17l7" dmnElementRef="decision_1nwzw38">
+        <dc:Bounds height="80" width="180" x="160" y="80" />
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="DMNShape_1ogdgy1" dmnElementRef="InputData_17vs6e3">
+        <dc:Bounds height="45" width="125" x="187" y="317" />
+      </dmndi:DMNShape>
+      <dmndi:DMNEdge id="DMNEdge_1oxy6y5" dmnElementRef="InformationRequirement_08jo4yt">
+        <di:waypoint x="250" y="317" />
+        <di:waypoint x="220" y="180" />
+        <di:waypoint x="220" y="160" />
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="DMNEdge_1ya6s7w" dmnElementRef="InformationRequirement_14j27jk">
+        <di:waypoint x="480" y="250" />
+        <di:waypoint x="280" y="180" />
+        <di:waypoint x="280" y="160" />
+      </dmndi:DMNEdge>
+      <dmndi:DMNShape id="DMNShape_02ebpg2" dmnElementRef="InputData_047drmz">
+        <dc:Bounds height="45" width="125" x="427" y="537" />
+      </dmndi:DMNShape>
+      <dmndi:DMNEdge id="DMNEdge_09n2snq" dmnElementRef="InformationRequirement_0h8a1yy">
+        <di:waypoint x="490" y="537" />
+        <di:waypoint x="480" y="350" />
+        <di:waypoint x="480" y="330" />
+      </dmndi:DMNEdge>
+      <dmndi:DMNShape id="DMNShape_17ct48d" dmnElementRef="Decision_0lzqqo5">
+        <dc:Bounds height="80" width="180" x="390" y="250" />
+      </dmndi:DMNShape>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+</definitions>
