@@ -24,6 +24,7 @@ test.describe('DMN Editor Tests', () => {
   test.beforeAll(async () => {
     console.log('Setting up before all tests');
     // Place setup code here if needed
+<<<<<<< HEAD
   });
 
   // Runs once after all tests
@@ -45,6 +46,45 @@ test.describe('DMN Editor Tests', () => {
   });
 
 
+=======
+  });
+
+  // Runs once after all tests
+  test.afterAll(async () => {
+    console.log('Cleaning up after all tests');
+    // Place teardown code here if needed
+  });
+
+  // Runs before each test
+  test.beforeEach(async ({ page }) => {
+    await page.goto('http://localhost:5173'); // Navigate to the DMN Editor page
+    await page.waitForSelector('#dmn-container'); // Wait for the DMN editor to load
+  });
+
+  // Runs after each test
+  test.afterEach(async () => {
+    console.log('Cleaning up after each test');
+    // Place any per-test cleanup code here if needed
+  });
+
+  test('should save diagram as JSON', async ({ page }) => {
+    const [download] = await Promise.all([
+      page.waitForEvent('download', { timeout: 60000 }), // Wait for the download event
+      page.click('#controls i.fas.fa-save'), // Trigger the download
+    ]);
+
+    const suggestedFilename = download.suggestedFilename();
+    expect(suggestedFilename).toBe('diagram.json');
+
+    const downloadPath = await download.path();
+    const fileContent = fs.readFileSync(downloadPath, 'utf-8');
+    const jsonData = JSON.parse(fileContent);
+    const xmlContent = jsonData.xml;
+
+    expect(xmlContent).toContain('<?xml version="1.0" encoding="UTF-8"?>');
+  });
+
+>>>>>>> b41ab7e109f49178a6417cac5869d9a42d88e60d
   test('should trigger file input and select a DMN file', async ({ page }) => {
     const dmnXML = `
     <?xml version="1.0" encoding="UTF-8"?>
@@ -121,6 +161,7 @@ test.describe('DMN Editor Tests', () => {
     // Verify that the file chooser dialog is opened
     expect(fileChooser).toBeDefined();
   });
+<<<<<<< HEAD
 
   test('should save DMN diagram as JSON', async ({ page }) => {
     // Create a temporary DMN file
@@ -179,4 +220,6 @@ test.describe('DMN Editor Tests', () => {
     }
   });
 
+=======
+>>>>>>> b41ab7e109f49178a6417cac5869d9a42d88e60d
 });
