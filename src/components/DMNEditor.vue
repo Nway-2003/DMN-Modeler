@@ -1,5 +1,15 @@
 <template>
   <div id="dmn-editor">
+    <div id="metadata">
+      <label>
+        Name:
+     <input type="text" v-model="metadata.name" readonly />
+      </label>
+      <label>
+        Date:
+        <input type="text" v-model="metadata.date" readonly />
+      </label>
+    </div>
     <div id="dmn-container" ref="dmnContainer"></div>
     <div id="controls">
       <i class="fas fa-save" @click="saveAsJson" title="Save as JSON"></i>
@@ -18,6 +28,10 @@ export default defineComponent({
     const dmnContainer = ref(null);
     const modeler = ref();
     const fileInput = ref();
+    const metadata = ref({
+      name: 'Nway Nandar Lin',  
+      date: new Date().toLocaleDateString(),
+    });
 
     onMounted(async () => {
       modeler.value = new DmnModeler({
@@ -54,20 +68,33 @@ export default defineComponent({
       }
     };
 
-    const saveAsJson = () => {
-      modeler.value.saveXML({ format: true }, (err, xml) => {
-        if (err) {
-          console.error('Could not save DMN diagram', err);
-          return;
-        }
-        const jsonBlob = new Blob([JSON.stringify({ xml })], { type: 'application/json' });
+    const saveAsJson = async () => {
+      try {
+        const { xml } = await modeler.value.saveXML({ format: true });
+
+        // Parse the XML to extract definitions and convert it to JSON
+        const definitions = modeler.value.getDefinitions();
+        
+        // Add metadata
+        const jsonContent = {
+          metadata: metadata.value,
+          definitions,
+        };
+
+        // Convert the combined object to a JSON string
+        const jsonString = JSON.stringify(jsonContent, null, 2);
+        
+        // Create a JSON blob and save it
+        const jsonBlob = new Blob([jsonString], { type: 'application/json' });
         const url = URL.createObjectURL(jsonBlob);
         const link = document.createElement('a');
         link.href = url;
         link.download = 'diagram.json';
         link.click();
         URL.revokeObjectURL(url);
-      });
+      } catch (err) {
+        console.error('Could not save DMN diagram as JSON', err);
+      }
     };
 
     const triggerFileInput = () => {
@@ -93,6 +120,7 @@ export default defineComponent({
       triggerFileInput,
       handleFileSelect,
       fileInput,
+      metadata,
     };
   },
 });
@@ -128,4 +156,38 @@ export default defineComponent({
 #controls i:hover {
   color: #007bff;
 }
+
+#metadata {
+  padding: 10px;
+  display: flex; /* Use flexbox layout */
+  gap: 20px; /* Add space between the fields */
+  align-items: center; /* Vertically center the labels and inputs */
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+#metadata label {
+  display: flex; /* Display label as flexbox */
+  align-items: center; /* Vertically center the label text and input */
+  gap: 10px; /* Add space between the label text and input */
+  font-size: 14px;
+  margin-left: 20px;
+}
+
+#metadata input {
+  width: 200px; /* Keep input fields shorter */
+  padding: 5px;
+  font-size: 14px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+  color: #333;
+}
+
+#metadata input[readonly] {
+  background-color: #e9ecef;
+  cursor: not-allowed;
+}
+
 </style>
