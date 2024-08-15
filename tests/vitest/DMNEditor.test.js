@@ -99,7 +99,7 @@ describe('DMNEditor.vue', () => {
     await wrapper.vm.$nextTick();
  
     // Verify that fetch was called
-    expect(global.fetch).toHaveBeenCalledWith('/public/dmn/diagram.dmn');
+    expect(global.fetch).toHaveBeenCalledWith('/dmn/diagram.dmn');
  
     // Ensure importXML was called with the correct XML
     expect(importXMLMock).toHaveBeenCalledWith('<dmn:Definitions></dmn:Definitions>');

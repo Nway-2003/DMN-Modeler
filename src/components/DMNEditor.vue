@@ -13,8 +13,21 @@
     <div id="dmn-container" ref="dmnContainer"></div>
     <div id="controls">
       <i class="fas fa-save" @click="saveAsJson" title="Save as JSON"></i>
+      <!-- New icon for Save as DMN -->
+      <i class="fas fa-file-code" @click="saveAsDmn" title="Save as DMN" style="margin-left: 10px;"></i>
       <i class="fas fa-upload" @click="triggerFileInput" title="Retrieve DMN"></i>
       <input type="file" ref="fileInput" @change="handleFileSelect" style="display: none" accept=".dmn" />
+
+      <!-- New reset button -->
+      <i class="fas fa-undo" @click="resetDiagram" title="Reset Diagram" style="margin-left: 10px;"></i>
+
+      <!-- New icon for exporting images -->
+      <i class="fas fa-image" @click="exportImage" title="Export as PNG" style="margin-left: 10px;"></i>
+
+       <!-- New icon for printing diagram -->
+      <i class="fas fa-print" @click="printDiagram" title="Print Diagram" style="margin-left: 10px;"></i>
+      
+     
     </div>
   </div>
 </template>
@@ -22,6 +35,7 @@
 <script>
 import { defineComponent, onMounted, ref } from 'vue';
 import DmnModeler from 'dmn-js/lib/Modeler';
+import html2canvas from 'html2canvas';
 
 export default defineComponent({
   setup() {
@@ -42,7 +56,7 @@ export default defineComponent({
       });
 
       try {
-        const dmnXML = await fetchDiagram('/public/dmn/diagram.dmn');
+        const dmnXML = await fetchDiagram('/dmn/diagram.dmn');
         await loadDiagram(dmnXML);
       } catch (error) {
         console.error('Error loading DMN XML:', error);
@@ -69,31 +83,51 @@ export default defineComponent({
     };
 
     const saveAsJson = async () => {
+  try {
+    // Retrieve the latest XML from the DMN modeler
+    const { xml } = await modeler.value.saveXML({ format: true });
+
+    // Get the latest definitions from the modeler (this includes the updates)
+    const definitions = modeler.value.getDefinitions();
+
+    // Add metadata (name and date)
+    const jsonContent = {
+      metadata: metadata.value,
+      definitions, // This now includes the latest data
+    };
+
+    // Convert the combined object to a JSON string
+    const jsonString = JSON.stringify(jsonContent, null, 2);
+
+    // Create a JSON blob and save it
+    const jsonBlob = new Blob([jsonString], { type: 'application/json' });
+    const url = URL.createObjectURL(jsonBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'diagram.json';
+    link.click();
+    URL.revokeObjectURL(url);
+  } catch (err) {
+    console.error('Could not save DMN diagram as JSON', err);
+  }
+};
+
+
+    // New function to save as DMN
+    const saveAsDmn = async () => {
       try {
         const { xml } = await modeler.value.saveXML({ format: true });
 
-        // Parse the XML to extract definitions and convert it to JSON
-        const definitions = modeler.value.getDefinitions();
-        
-        // Add metadata
-        const jsonContent = {
-          metadata: metadata.value,
-          definitions,
-        };
-
-        // Convert the combined object to a JSON string
-        const jsonString = JSON.stringify(jsonContent, null, 2);
-        
-        // Create a JSON blob and save it
-        const jsonBlob = new Blob([jsonString], { type: 'application/json' });
-        const url = URL.createObjectURL(jsonBlob);
+        // Create a DMN Blob and save it
+        const dmnBlob = new Blob([xml], { type: 'application/xml' });
+        const url = URL.createObjectURL(dmnBlob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = 'diagram.json';
+        link.download = 'diagram.dmn';
         link.click();
         URL.revokeObjectURL(url);
       } catch (err) {
-        console.error('Could not save DMN diagram as JSON', err);
+        console.error('Could not save DMN diagram as DMN', err);
       }
     };
 
@@ -114,11 +148,102 @@ export default defineComponent({
       }
     };
 
+  const resetDiagram = async () => {
+  try {
+    const response = await fetch('/dmn/empty.dmn');
+    
+    // Use optional chaining and nullish coalescing operator for safer checks
+    if (!response?.ok) {
+      throw new Error('Failed to load the default diagram.');
+    }
+
+    // Extract XML from the response
+    const dmnXML = await response.text();
+    
+    // Ensure modeler is properly initialized
+    if (modeler.value) {
+      await modeler.value.importXML(dmnXML);
+      console.log('Diagram has been reset to default.');
+    } else {
+      console.warn('Modeler is not initialized.');
+    }
+  } catch (error) {
+    console.error('Error resetting diagram:', error);
+  }
+};
+
+ const exportImage = async () => {
+  try {
+    // Temporarily hide elements with specific classes
+    const elementsToHide = document.querySelectorAll(
+      ".djs-palette.open, .dmn-definitions, .view-drd-button"
+    );
+    elementsToHide.forEach(el => el.style.visibility = 'hidden');
+
+    // Capture the DMN container
+    const canvas = await html2canvas(dmnContainer.value);
+    const dataURL = canvas.toDataURL('image/png'); // Always export as PNG
+
+    // Restore the visibility of the hidden elements
+    elementsToHide.forEach(el => el.style.visibility = '');
+
+    // Create a link to download the image
+    const link = document.createElement('a');
+    link.href = dataURL;
+    link.download = 'diagram.png'; // Default to PNG
+    link.click();
+  } catch (error) {
+    console.error('Error exporting diagram as PNG:', error);
+  }
+};
+
+const printDiagram = async () => {
+  try {
+    // Temporarily hide elements with specific classes
+    const elementsToHide = document.querySelectorAll(
+      ".djs-palette.open, .dmn-definitions, .view-drd-button"
+    );
+    elementsToHide.forEach(el => el.style.visibility = 'hidden');
+
+    // Capture the DMN container
+    const canvas = await html2canvas(dmnContainer.value);
+    const dataURL = canvas.toDataURL('image/png');
+
+    // Restore the visibility of the hidden elements
+    elementsToHide.forEach(el => el.style.visibility = '');
+
+    // Create a new window to display the image for printing
+    const printWindow = window.open('', '', 'height=600,width=800');
+    printWindow.document.open();
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Print Diagram</title>
+        </head>
+        <body onload="window.print();window.close();">
+          <img src="${dataURL}" style="width: 100%; height: auto;">
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+  } catch (error) {
+    console.error('Error printing diagram:', error);
+  }
+};
+
+
+
+
+
     return {
       dmnContainer,
       saveAsJson,
+      saveAsDmn,
       triggerFileInput,
       handleFileSelect,
+      resetDiagram,
+      exportImage,
+      printDiagram,
       fileInput,
       metadata,
     };
@@ -132,7 +257,7 @@ export default defineComponent({
   flex-direction: column;
   height: 100vh;
   width: 100vw;
-  margin: -60px;
+  margin: 0px;
 }
 
 #dmn-container {
@@ -145,6 +270,9 @@ export default defineComponent({
   padding-left: 30px;
   padding-bottom: 30px;
   align-items: center;
+  
+  position : sticky;
+ 
 }
 
 #controls i {

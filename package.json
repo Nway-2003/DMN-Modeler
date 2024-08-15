@@ -15,6 +15,7 @@
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.6.0",
     "dmn-js": "^16.6.2",
+    "html2canvas": "^1.4.1",
     "playwright": "^1.46.0",
     "vue": "^3.4.29"
   },
