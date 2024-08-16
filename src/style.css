@@ -28,6 +28,8 @@
     place-items: center;
     min-width: 100px;
     min-height: 100vh;
+    
+    
   }
   
   h1 {
@@ -52,4 +54,6 @@
     }
    
   }
+
+  
   

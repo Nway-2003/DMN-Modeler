@@ -27,6 +27,10 @@
        <!-- New icon for printing diagram -->
       <i class="fas fa-print" @click="printDiagram" title="Print Diagram" style="margin-left: 10px;"></i>
       
+       <!-- New zoom controls -->
+      <i class="fas fa-search-plus" @click="zoomIn" title="Zoom In" style="margin-left: 10px;"></i>
+      <i class="fas fa-search-minus" @click="zoomOut" title="Zoom Out" style="margin-left: 10px;"></i>
+      
      
     </div>
   </div>
@@ -37,11 +41,12 @@ import { defineComponent, onMounted, ref } from 'vue';
 import DmnModeler from 'dmn-js/lib/Modeler';
 import html2canvas from 'html2canvas';
 
+
 export default defineComponent({
   setup() {
     const dmnContainer = ref(null);
     const modeler = ref();
-    const fileInput = ref();
+    const fileInput = ref();   
     const metadata = ref({
       name: 'Nway Nandar Lin',  
       date: new Date().toLocaleDateString(),
@@ -76,6 +81,7 @@ export default defineComponent({
         if (activeView?.type === 'drd') {
           const canvas = modeler.value.getActiveViewer().get('canvas');
           canvas.zoom('fit-viewport');
+
         }
       } catch (error) {
         console.error('Could not import DMN diagram', error);
@@ -231,8 +237,17 @@ const printDiagram = async () => {
   }
 };
 
+const zoomIn = () => {
+      const canvas = modeler.value.getActiveViewer().get('canvas');
+      const zoomLevel = canvas.zoom() || 1;
+      canvas.zoom(zoomLevel * 1.2);
+    };
 
-
+    const zoomOut = () => {
+      const canvas = modeler.value.getActiveViewer().get('canvas');
+      const zoomLevel = canvas.zoom() || 1;
+      canvas.zoom(zoomLevel / 1.2);
+    };
 
 
     return {
@@ -244,8 +259,12 @@ const printDiagram = async () => {
       resetDiagram,
       exportImage,
       printDiagram,
+      zoomIn,
+      zoomOut,
       fileInput,
       metadata,
+    
+
     };
   },
 });
@@ -262,6 +281,7 @@ const printDiagram = async () => {
 
 #dmn-container {
   flex: 1;
+  margin-left: 20px;
 }
 
 #controls {
@@ -269,8 +289,7 @@ const printDiagram = async () => {
   gap: 20px;
   padding-left: 30px;
   padding-bottom: 30px;
-  align-items: center;
-  
+  align-items: center; 
   position : sticky;
  
 }
@@ -317,5 +336,6 @@ const printDiagram = async () => {
   background-color: #e9ecef;
   cursor: not-allowed;
 }
+
 
 </style>
