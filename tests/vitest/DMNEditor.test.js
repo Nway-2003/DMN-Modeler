@@ -104,4 +104,55 @@ describe('DMNEditor.vue', () => {
     // Ensure importXML was called with the correct XML
     expect(importXMLMock).toHaveBeenCalledWith('<dmn:Definitions></dmn:Definitions>');
   });
+
+  it('saves the diagram as DMN when Save as DMN button is clicked', async () => {
+    // Mock the saveXML function to return a sample DMN XML
+    saveXMLMock.mockResolvedValue({ xml: '<dmn:Definitions></dmn:Definitions>' });
+  
+    const wrapper = mount(DMNEditor);
+  
+    // Find the Save as DMN button and trigger a click event
+    const saveAsDmnButton = wrapper.find('i[title="Save as DMN"]');
+    await saveAsDmnButton.trigger('click');
+  
+    // Ensure that saveXML was called
+    expect(saveXMLMock).toHaveBeenCalled();
+  
+    // Ensure that the DMN XML was properly saved
+    expect(createObjectURLMock).toHaveBeenCalled();
+    expect(revokeObjectURLMock).toHaveBeenCalled();
+  });
+
+  it('resets the diagram to default state when resetDiagram is called', async () => {
+    // Mock the fetch response for the default DMN file
+    const defaultDmnXML = '<dmn:Definitions></dmn:Definitions>';
+    global.fetch.mockResolvedValueOnce({
+      ok: true,
+      text: () => Promise.resolve(defaultDmnXML),
+    });
+  
+    const wrapper = mount(DMNEditor);
+  
+    // Call the resetDiagram method
+    await wrapper.vm.resetDiagram();
+  
+    // Verify that importXML was called with the default DMN XML
+    expect(importXMLMock).toHaveBeenCalledWith(defaultDmnXML);
+  });
+
+  it('displays the correct metadata', () => {
+    // Mount the component
+    const wrapper = mount(DMNEditor);
+
+    // Find the metadata inputs
+    const nameInput = wrapper.find('#metadata input[type="text"]').element;
+    const dateInput = wrapper.findAll('#metadata input[type="text"]').at(1).element;
+
+    // Verify that the metadata is correctly rendered
+    expect(nameInput.value).toBe('Nway Nandar Lin'); // Check default name
+    expect(dateInput.value).toBe(new Date().toLocaleDateString()); // Check default date
+  });
+  
+  
+  
 });
